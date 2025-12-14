@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Notes 🌸</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<button onclick="toggleDark()">🌙 Toggle Dark</button>
+<div class="container">
+<aside>
+<form action="/create_folder" method="POST">
+<input name="name" placeholder="New Folder">
+<button>Add</button>
+</form>
+<ul>
+{% for f in folders %}
+<li>{{ f.name }}</li>
+{% endfor %}
+</ul>
+</aside>
+
+
+<main>
+<input id="title" placeholder="Title">
+<textarea id="content" placeholder="Write a memory 💕"></textarea>
+<button onclick="saveNote()">Save 💖</button>
+</main>
+</div>
+<script src="/static/script.js"></script>
+</body>
+</html>
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Notes 🌸</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+<aside>
+<form action="/create_folder" method="POST">
+<input name="name" placeholder="New Folder">
+<button>Add</button>
+</form>
+<ul>
+{% for f in folders %}
+<li>{{ f.name }}</li>
+{% endfor %}
+</ul>
+</aside>
+
+
+<main>
+<input id="title" placeholder="Title">
+<select id="color">
+<option value="#fff8dc">Cream</option>
+<option value="#ffe4e1">Pink</option>
+<option value="#e0ffff">Blue</option>
+</select>
+
+
+<select id="font">
+<option value="cursive">Cursive</option>
+<option value="serif">Serif</option>
+<option value="monospace">Mono</option>
+</select>
+
+
+</html>
