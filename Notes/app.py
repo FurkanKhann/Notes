@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, jsonify
 from supabase_client import supabase
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "love_secret_key_sadqua_2025"
