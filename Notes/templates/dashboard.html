@@ -1,70 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>My Notes 🌸</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notes 🌸</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@300;400;500;600;700&family=Patrick+Hand&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<button onclick="toggleDark()">🌙 Toggle Dark</button>
-<div class="container">
-<aside>
-<form action="/create_folder" method="POST">
-<input name="name" placeholder="New Folder">
-<button>Add</button>
-</form>
-<ul>
-{% for f in folders %}
-<li>{{ f.name }}</li>
-{% endfor %}
-</ul>
-</aside>
-
-
-<main>
-<input id="title" placeholder="Title">
-<textarea id="content" placeholder="Write a memory 💕"></textarea>
-<button onclick="saveNote()">Save 💖</button>
-</main>
-</div>
-<script src="/static/script.js"></script>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">💕 My Folders</h2>
+                <div class="sidebar-header-actions">
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                    <button class="theme-toggle" onclick="openCustomizeModal()" title="Customize Background">
+                        <span>🎨</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="folder-create">
+                <input 
+                    type="text" 
+                    id="newFolderName" 
+                    placeholder="New folder name..."
+                    onkeypress="if(event.key==='Enter') createFolder()"
+                >
+                <button onclick="createFolder()" class="btn-create-folder">
+                    <span>+</span>
+                </button>
+            </div>
+            
+            <div class="folders-list">
+                {% for folder in folders %}
+                <div class="folder-item" onclick="selectFolder('{{ folder.id }}', '{{ folder.name }}')">
+                    <div class="folder-info">
+                        <span class="folder-icon">📁</span>
+                        <span class="folder-name">{{ folder.name }}</span>
+                    </div>
+                    <button class="folder-delete" onclick="event.stopPropagation(); deleteFolder('{{ folder.id }}')">
+                        🗑️
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-btn">Logout 👋</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    ☰
+                </button>
+                <div class="topbar-content">
+                    <h1 class="current-folder-name">Select a folder to start</h1>
+                    <p class="topbar-greeting">What would you like to store today, Miss Sadqua? 💝</p>
+                </div>
+            </div>
+            
+            <div class="notes-container" id="notesContainer">
+                <div class="welcome-message">
+                    <div class="welcome-icon">📝</div>
+                    <h2>Welcome, Sadqua! 💕</h2>
+                    <p>Your personal space to capture thoughts, dreams, and memories</p>
+                    <p class="welcome-subtext">Select a folder from the sidebar to begin your journey ✨</p>
+                </div>
+            </div>
+            
+            <!-- Note Editor Modal -->
+            <div class="modal" id="noteModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modalTitle">New Note</h2>
+                        <button class="modal-close" onclick="closeNoteModal()">×</button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <input 
+                            type="text" 
+                            id="noteTitle" 
+                            placeholder="Give your note a beautiful title..."
+                            class="note-title-input"
+                        >
+                        
+                        <div class="note-toolbar">
+                            <div class="toolbar-group">
+                                <button type="button" class="toolbar-btn" onclick="formatText('bold')" title="Bold (Ctrl+B)">
+                                    <strong>B</strong>
+                                </button>
+                                <button type="button" class="toolbar-btn" onclick="formatText('italic')" title="Italic (Ctrl+I)">
+                                    <em>I</em>
+                                </button>
+                                <button type="button" class="toolbar-btn" onclick="formatText('underline')" title="Underline (Ctrl+U)">
+                                    <u>U</u>
+                                </button>
+                                <button type="button" class="toolbar-btn" onclick="formatText('strikethrough')" title="Strikethrough">
+                                    <s>S</s>
+                                </button>
+                            </div>
+                            
+                            <div class="toolbar-divider"></div>
+                            
+                            <div class="toolbar-group">
+                                <button type="button" class="toolbar-btn" onclick="formatText('heading')" title="Heading">
+                                    H1
+                                </button>
+                                <button type="button" class="toolbar-btn" onclick="formatText('bullet')" title="Bullet List">
+                                    • List
+                                </button>
+                                <button type="button" class="toolbar-btn" onclick="formatText('number')" title="Numbered List">
+                                    1. List
+                                </button>
+                            </div>
+                            
+                            <div class="toolbar-divider"></div>
+                            
+                            <div class="toolbar-group">
+                                <button type="button" class="toolbar-btn color-picker-btn" onclick="document.getElementById('textColor').click()" title="Text Color">
+                                    <span style="font-weight: bold; color: #e91e63;">A</span>
+                                    <input type="color" id="textColor" onchange="changeTextColor()" style="position: absolute; opacity: 0; pointer-events: none;">
+                                </button>
+                                <button type="button" class="toolbar-btn highlight-picker-btn" onclick="document.getElementById('highlightColor').click()" title="Highlight">
+                                    <span>🎨</span>
+                                    <input type="color" id="highlightColor" onchange="changeHighlight()" style="position: absolute; opacity: 0; pointer-events: none;">
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="note-options">
+                            <div class="option-group">
+                                <label>Background Color</label>
+                                <select id="noteColor" onchange="updatePreview()">
+                                    <option value="#fff8dc">🌼 Cream</option>
+                                    <option value="#ffe4e1">🌸 Rose Pink</option>
+                                    <option value="#e0ffff">💙 Sky Blue</option>
+                                    <option value="#f0fff0">💚 Mint Green</option>
+                                    <option value="#fff0f5">💕 Lavender Blush</option>
+                                    <option value="#fffacd">🌟 Lemon Chiffon</option>
+                                    <option value="#ffe4b5">🍑 Peach</option>
+                                    <option value="#e6e6fa">💜 Lavender</option>
+                                </select>
+                            </div>
+                            
+                            <div class="option-group">
+                                <label>Font Style</label>
+                                <select id="noteFont" onchange="updatePreview()">
+                                    <option value="Quicksand">✨ Modern</option>
+                                    <option value="Patrick Hand">✍️ Handwritten</option>
+                                    <option value="Pacifico">🌊 Casual</option>
+                                    <option value="Dancing Script">💃 Elegant</option>
+                                    <option value="monospace">💻 Code</option>
+                                    <option value="Georgia">📖 Serif</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div 
+                            id="noteContent"
+                            contenteditable="true"
+                            class="note-content-input rich-editor"
+                            placeholder="Pour your heart out, Sadqua... ✨💭"
+                        ></div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button class="summary-btn" onclick="summarizeNote()" type="button">
+                            ✨ AI Summary
+                        </button>
+                        <button class="btn-secondary" onclick="closeNoteModal()" type="button">Cancel</button>
+                        <button class="btn-primary" onclick="saveNote()" type="button">
+                            Save Note 💖
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floating Action Button -->
+            <button class="fab" id="fabButton" onclick="openNoteModal()" style="display: none;">
+                <span>+</span>
+            </button>
+        </main>
+        
+        <!-- Customize Background Modal -->
+        <div class="modal" id="customizeModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🎨 Customize Background</h2>
+                    <button class="modal-close" onclick="closeCustomizeModal()">×</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="customize-section">
+                        <h3>Gradient Backgrounds</h3>
+                        <div class="background-grid">
+                            <div class="bg-option gradient-1" onclick="setBackground('gradient', 'gradient-1')" title="Sunset Dreams"></div>
+                            <div class="bg-option gradient-2" onclick="setBackground('gradient', 'gradient-2')" title="Ocean Breeze"></div>
+                            <div class="bg-option gradient-3" onclick="setBackground('gradient', 'gradient-3')" title="Purple Haze"></div>
+                            <div class="bg-option gradient-4" onclick="setBackground('gradient', 'gradient-4')" title="Pink Paradise"></div>
+                            <div class="bg-option gradient-5" onclick="setBackground('gradient', 'gradient-5')" title="Mint Fresh"></div>
+                            <div class="bg-option gradient-6" onclick="setBackground('gradient', 'gradient-6')" title="Peachy Keen"></div>
+                            <div class="bg-option gradient-7" onclick="setBackground('gradient', 'gradient-7')" title="Lavender Love"></div>
+                            <div class="bg-option gradient-8" onclick="setBackground('gradient', 'gradient-8')" title="Rose Gold"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="customize-section">
+                        <h3>Patterns</h3>
+                        <div class="background-grid">
+                            <div class="bg-option pattern-dots" onclick="setBackground('pattern', 'pattern-dots')" title="Polka Dots"></div>
+                            <div class="bg-option pattern-hearts" onclick="setBackground('pattern', 'pattern-hearts')" title="Hearts"></div>
+                            <div class="bg-option pattern-waves" onclick="setBackground('pattern', 'pattern-waves')" title="Waves"></div>
+                            <div class="bg-option pattern-grid" onclick="setBackground('pattern', 'pattern-grid')" title="Grid"></div>
+                            <div class="bg-option pattern-diagonal" onclick="setBackground('pattern', 'pattern-diagonal')" title="Diagonal"></div>
+                            <div class="bg-option pattern-stars" onclick="setBackground('pattern', 'pattern-stars')" title="Stars"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="customize-section">
+                        <h3>Textures</h3>
+                        <div class="background-grid">
+                            <div class="bg-option texture-paper" onclick="setBackground('texture', 'texture-paper')" title="Paper"></div>
+                            <div class="bg-option texture-fabric" onclick="setBackground('texture', 'texture-fabric')" title="Fabric"></div>
+                            <div class="bg-option texture-wood" onclick="setBackground('texture', 'texture-wood')" title="Wood"></div>
+                            <div class="bg-option texture-marble" onclick="setBackground('texture', 'texture-marble')" title="Marble"></div>
+                            <div class="bg-option texture-concrete" onclick="setBackground('texture', 'texture-concrete')" title="Concrete"></div>
+                            <div class="bg-option texture-leather" onclick="setBackground('texture', 'texture-leather')" title="Leather"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="customize-section">
+                        <button class="btn-secondary" onclick="setBackground('default', 'default')" style="width: 100%;">
+                            Reset to Default
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="closeCustomizeModal()">Done 💖</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
 </body>
-</html>
-```html
-<!DOCTYPE html>
-<html>
-<head>
-<title>My Notes 🌸</title>
-<link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-<div class="container">
-<aside>
-<form action="/create_folder" method="POST">
-<input name="name" placeholder="New Folder">
-<button>Add</button>
-</form>
-<ul>
-{% for f in folders %}
-<li>{{ f.name }}</li>
-{% endfor %}
-</ul>
-</aside>
-
-
-<main>
-<input id="title" placeholder="Title">
-<select id="color">
-<option value="#fff8dc">Cream</option>
-<option value="#ffe4e1">Pink</option>
-<option value="#e0ffff">Blue</option>
-</select>
-
-
-<select id="font">
-<option value="cursive">Cursive</option>
-<option value="serif">Serif</option>
-<option value="monospace">Mono</option>
-</select>
-
-
 </html>
