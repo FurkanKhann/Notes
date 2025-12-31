@@ -1,15 +1,361 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Login 💖</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadqua's Love Notes 💕</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Floating hearts */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            bottom: -50px;
+            font-size: 1.5rem;
+            animation: floatUp 12s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes floatUp {
+            0% {
+                bottom: -50px;
+                opacity: 0.3;
+                transform: translateX(0) rotate(0deg);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(100px) rotate(180deg);
+            }
+            100% {
+                bottom: 110%;
+                opacity: 0;
+                transform: translateX(-100px) rotate(360deg);
+            }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 48px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            border: 1px solid #fcc;
+            text-align: center;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #212529;
+            font-size: 0.875rem;
+            letter-spacing: 0.2px;
+        }
+
+        .input-group input {
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #f8f9fa;
+            color: #212529;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #e91e63;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-group input::placeholder {
+            color: #adb5bd;
+        }
+
+        .login-button {
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .heart-icon {
+            display: inline-block;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(1.1); }
+            20%, 40% { transform: scale(1); }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .decorative-element {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .decorative-element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .decorative-element:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+
+        .decorative-element:nth-child(3) {
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 2s;
+        }
+
+        .decorative-element:nth-child(4) {
+            bottom: 20%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .login-title {
+                font-size: 1.75rem;
+            }
+
+            .login-subtitle {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
 </head>
-<body class="center">
-<form method="POST" class="card">
-<h2>Welcome 💕</h2>
-<input name="email" placeholder="Email" required>
-<input name="password" type="password" placeholder="Password" required>
-<button>Login</button>
-</form>
+<body>
+    <!-- Decorative Elements -->
+    <div class="decorative-element">💖</div>
+    <div class="decorative-element">✨</div>
+    <div class="decorative-element">🌸</div>
+    <div class="decorative-element">💝</div>
+
+    <!-- Floating Hearts -->
+    <div class="floating-hearts">
+        <span class="floating-heart" style="left: 10%; animation-delay: 0s;">💗</span>
+        <span class="floating-heart" style="left: 20%; animation-delay: 2s;">💖</span>
+        <span class="floating-heart" style="left: 30%; animation-delay: 4s;">💕</span>
+        <span class="floating-heart" style="left: 40%; animation-delay: 1s;">💓</span>
+        <span class="floating-heart" style="left: 50%; animation-delay: 3s;">💝</span>
+        <span class="floating-heart" style="left: 60%; animation-delay: 5s;">💗</span>
+        <span class="floating-heart" style="left: 70%; animation-delay: 2.5s;">💖</span>
+        <span class="floating-heart" style="left: 80%; animation-delay: 4.5s;">💕</span>
+        <span class="floating-heart" style="left: 90%; animation-delay: 1.5s;">💓</span>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">💖 Sadqua's Notes 💖</h1>
+                <p class="login-subtitle">A Special Place for Your Beautiful Thoughts</p>
+            </div>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="login-form">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="your.email@example.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password" 
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <button type="submit" class="login-button">
+                    <span>Login</span>
+                    <span class="heart-icon">💕</span>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Made with 💝 for Sadqua</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
